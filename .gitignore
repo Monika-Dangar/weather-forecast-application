@@ -1,0 +1,5 @@
+# Ignore the config.js file
+config.js
+
+# Ignore tailwind.config.js file
+tailwind.config.js

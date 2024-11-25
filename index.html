@@ -4,12 +4,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Forecast Application</title>
+    <title>Weather Forecast Dashboard</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <h1 class="text-xl">Weather Forecast Application</h1>
+<body class="bg-gray-100">
+
+    <!-- Header Section -->
+    <header class="bg-blue-500 text-white py-4">
+        <div class="max-w-4xl mx-auto px-4">
+            <h1 class="text-3xl font-bold text-center">Weather Forecast Dashboard</h1>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+            <!-- Search and Dropdown Section -->
+            <div class="relative w-full sm:w-2/3">
+                <!-- Search Input -->
+                <form action="" class="flex items-center">
+                    <input type="text" id="citySearch" placeholder="Enter city name (E.g., Mumbai, New York, London)"
+                        required class="w-full py-2 px-4 border border-gray-300 rounded-md text-gray-700 
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    <button id="searchButton" type="button"
+                        class="ml-4 bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 focus:outline-none">
+                        Search
+                    </button>
+                </form>
+
+                <!-- Dropdown List -->
+                <ul id="dropdownList" class="absolute left-0 w-full py-2 mt-1 bg-white border border-gray-200 rounded-md shadow-lg 
+                           z-10 divide-y divide-gray-100 text-gray-700 max-h-48 overflow-y-auto hidden">
+                    <!-- Cities will be added dynamically -->
+                </ul>
+            </div>
+
+            <!-- Current Location Button -->
+            <div class="relative mt-4 sm:mt-0">
+                <button id="currentLocation"
+                    class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none">
+                    Current location
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Current Weather Section -->
+        <div id="currentWeather" class="bg-zinc-400 p-6 rounded-md shadow-md mb-8 text-white">
+            <h2 class="text-xl font-semibold currentDateAndTime">Current Date</h2>
+            <div class="flex items-center justify-between mb-4">
+                <!-- Weather Icon and Desc-->
+                <div class="flex flex-col items-center">
+                    <img id="weatherIcon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="weather icon"
+                        class="w-16 h-16" loading="lazy" />
+                    <p id="weatherDesc">weather desc</p>
+                </div>
+                <!-- Air Quality Index -->
+                <div>
+                    <p class="text-2xl font-semibold text-center" id="aqi">AQI</p>
+                    <p class="text-2xl font-semibold text-center" id="aqiDisplay"></p>
+                </div>
+                <!-- Weather details -->
+                <div>
+                    <h3 id="cityName" class="text-2xl font-bold">City Name</h3>
+                    <p id="currentTemperature" class="text-xl">Temperature: 20°C</p>
+                    <p id="currentHumidity" class="text-lg">Humidity: 60%</p>
+                    <p id="currentWind" class="text-lg">Wind: 15 km/h</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extended Forecast Section -->
+        <p class="text-black text-xl mb-2 font-semibold ">5-Day Forecast</p>
+        <div id="extendedForecast"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 text-white font-semibold">
+            <!-- Example of one forecast card -->
+            <div class="bg-zinc-400 p-4 rounded-md shadow-md" id="forecastTemplate">
+                <h3 class="text-lg font-semibold">Day 1</h3>
+                <div class="flex flex-col items-center">
+                    <img src="https://via.placeholder.com/50" id="" alt="weather icon" class="w-14 h-14 mx-auto"
+                        loading="lazy" />
+                    <p class="desc mb-2">desc</p>
+                </div>
+                <p class="text-sm lg:text-xs temperature">Temp: 22°C</p>
+                <p class="text-sm lg:text-xs humidity">Humidity: 55%</p>
+                <p class="text-sm lg:text-xs wind">Wind: 10 km/h</p>
+            </div>
+            <!-- More forecast cards will be added dynamically -->
+        </div>
+    </div>
+
+    <!-- Error Message Section (Initially hidden) -->
+    <div id="errorMessage" class="fixed top-0 left-0 right-0 p-4 bg-red-500 text-white text-center hidden">
+        <p id="errorText"></p>
+    </div>
+
+    <script type="module" src="index.js"></script>
 </body>
 
 </html>
