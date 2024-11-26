@@ -186,10 +186,11 @@ const MAX_SUGGESTIONS = 5; // Limit the dropdown to 5 cities
 
 function dropDownList(cityName) {
 
+    // Add the city to the Set if not already present
     if (!citySuggestions.has(cityName)) {
         citySuggestions.add(cityName);
         const cityArray = Array.from(citySuggestions);
-        sessionStorage.setItem("cityName", JSON.stringify(cityArray));
+        sessionStorage.setItem("cityName", JSON.stringify(cityArray));  // Store in sessionStorage
     }
 
     // Clear any existing items in the dropdown list
@@ -202,28 +203,44 @@ function dropDownList(cityName) {
         // Limit the number of cities shown in the dropdown
         const filteredCities = cities.slice(0, MAX_SUGGESTIONS);
 
-        // Now you can use forEach to iterate over the array
         filteredCities.forEach((city) => {
-            // console.log("City: " + city);
+            // Create the list item for each city
             const list = document.createElement("li");
-            list.cssText = "cursor: pointer;"
             list.textContent = city;
+            list.style.cursor = "pointer"; // Make the cursor a pointer for click action
 
+            // Event listener to update input field on click
             list.addEventListener("click", () => {
-                citySearch.value = city;
-                dropdownList.classList.add("hidden"); // Hide the dropdown after selection
-            })
+                console.log(city);
 
-            dropdownList.appendChild(list);
+                citySearch.value = city;  // Set the value of the input field
+                dropdownList.classList.add("hidden");  // Hide the dropdown after selection
+            });
+
+            dropdownList.appendChild(list);  // Append the list item to the dropdown
         });
-        // console.log(cities);
-        dropdownList.classList.remove("hidden")
+
+        // Show the dropdown if there are cities to display
+        dropdownList.classList.remove("hidden");
 
     } else {
         console.log("No cities found in sessionStorage.");
     }
-    l
 }
+
+// Event listener for focus event to show dropdown list
+citySearch.addEventListener("focus", () => {
+    const cityName = citySearch.value.trim();
+    dropDownList(cityName);
+});
+
+// Event listener for focusout event to hide the dropdown
+citySearch.addEventListener("focusout", () => {
+    // Use a small timeout to allow click event on the list item
+    setTimeout(() => {
+        dropdownList.classList.add("hidden");
+    }, 200);
+});
 
 citySearch.addEventListener("focus", () => {
     const cityName = citySearch.value.trim();
@@ -236,8 +253,17 @@ citySearch.addEventListener("focusout", () => {
 
 searchButton.addEventListener("click", async () => {
     const cityName = citySearch.value.trim();
-    if (cityName) {
+    if (!cityName) {
+        errorMessage.classList.remove("hidden");
+        errorMessage.querySelector("#errorText").textContent = `Please enter city name.`
+        setTimeout(() => {
+            citySearch.value = ""
+            errorMessage.classList.add("hidden");
+        }, 2000)
 
+    }
+
+    if (cityName) {
         const coordinates = await fetchCoordinates(cityName);
 
         if (coordinates) {
