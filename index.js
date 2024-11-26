@@ -180,10 +180,64 @@ function displayForecastWeather(resp) {
     });
 }
 
+const citySuggestions = new Set();
+const dropdownList = document.querySelector("#dropdownList");
+const MAX_SUGGESTIONS = 5; // Limit the dropdown to 5 cities
+
+function dropDownList(cityName) {
+
+    if (!citySuggestions.has(cityName)) {
+        citySuggestions.add(cityName);
+        const cityArray = Array.from(citySuggestions);
+        sessionStorage.setItem("cityName", JSON.stringify(cityArray));
+    }
+
+    // Clear any existing items in the dropdown list
+    dropdownList.innerHTML = '';
+
+    let cities = sessionStorage.getItem("cityName");
+    if (cities) {
+        cities = JSON.parse(cities);
+
+        // Limit the number of cities shown in the dropdown
+        const filteredCities = cities.slice(0, MAX_SUGGESTIONS);
+
+        // Now you can use forEach to iterate over the array
+        filteredCities.forEach((city) => {
+            // console.log("City: " + city);
+            const list = document.createElement("li");
+            list.cssText = "cursor: pointer;"
+            list.textContent = city;
+
+            list.addEventListener("click", () => {
+                citySearch.value = city;
+                dropdownList.classList.add("hidden"); // Hide the dropdown after selection
+            })
+
+            dropdownList.appendChild(list);
+        });
+        // console.log(cities);
+        dropdownList.classList.remove("hidden")
+
+    } else {
+        console.log("No cities found in sessionStorage.");
+    }
+    l
+}
+
+citySearch.addEventListener("focus", () => {
+    const cityName = citySearch.value.trim();
+    dropDownList(cityName);
+});
+
+citySearch.addEventListener("focusout", () => {
+    dropdownList.classList.add("hidden")
+})
+
 searchButton.addEventListener("click", async () => {
     const cityName = citySearch.value.trim();
-
     if (cityName) {
+
         const coordinates = await fetchCoordinates(cityName);
 
         if (coordinates) {
