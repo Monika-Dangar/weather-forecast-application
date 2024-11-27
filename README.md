@@ -31,17 +31,12 @@ Follow these steps to run the project locally:
 
 To use the application, you need an API key from OpenWeather.  
 
-1. Create a `config.js` file in the root directory:
+1. In a `config.js` file in the root directory add your API Key:
    ```javascript
    export const API_KEY = "your_openweather_api_key";
    export const API = "https://api.openweathermap.org/data/2.5";
    export const GEO_API = "https://api.openweathermap.org/geo/1.0";
    export const ICON_URL = "https://openweathermap.org/img/wn/";
-   ```
-
-2. Add `config.js` to your `.gitignore` file to avoid exposing sensitive information:
-   ```
-   config.js
    ```
 
 ## Usage 🛠️
