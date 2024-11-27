@@ -46,9 +46,8 @@ To use the application, you need an API key from OpenWeather.
 ```plaintext
 .
 ├── index.html         # Main HTML file
-├── style.css          # CSS styles
 ├── index.js           # Main JavaScript logic
-├── config.js          # API configurations (ignored in .gitignore)
+├── config.js          # API configurations ()
 ├── .gitignore         # Files to ignore in Git
 └── README.md          # Project documentation
 ```
