@@ -4,6 +4,10 @@ const citySearch = document.getElementById("citySearch");
 const searchButton = document.getElementById("searchButton")
 const currentLocation = document.getElementById("currentLocation")
 const errorMessage = document.getElementById("errorMessage");
+const citySuggestions = new Set();  // To store unique city names
+const dropdownList = document.querySelector("#dropdownList");
+const MAX_SUGGESTIONS = 5; // Limit the dropdown to 5 cities
+
 // Default fallback coordinates (Mumbai, for example)
 const DEFAULT_LAT = 19.07; // Mumbai Latitude
 const DEFAULT_LON = 72.87; // Mumbai Longitude
@@ -43,8 +47,8 @@ function airQualityIndex(aqi) {
     return aqiMsg;
 }
 
+// Convert Unix timestamp to Date object
 function convertDataAndTime(dt) {
-    // Convert Unix timestamp to Date object
     const date = new Date(dt * 1000);
     const dateString = date.toLocaleDateString();  // Format the date
     const timeString = date.toLocaleTimeString();  // Format the time    
@@ -180,76 +184,78 @@ function displayForecastWeather(resp) {
     });
 }
 
-const citySuggestions = new Set();
-const dropdownList = document.querySelector("#dropdownList");
-const MAX_SUGGESTIONS = 5; // Limit the dropdown to 5 cities
-
-function dropDownList(cityName) {
-
-    // Add the city to the Set if not already present
-    if (!citySuggestions.has(cityName)) {
+// Add city to session storage if it's a valid city name (not a partial input)
+function addCityToSuggestions(cityName) {
+    if (cityName && !citySuggestions.has(cityName)) {
         citySuggestions.add(cityName);
         const cityArray = Array.from(citySuggestions);
         sessionStorage.setItem("cityName", JSON.stringify(cityArray));  // Store in sessionStorage
+    }
+}
+
+// Function to update the dropdown with city suggestions based on user input
+function dropDownList(cityName) {
+    // Only add valid city names (after typing complete city name, not partials)
+    if (cityName.length > 1 && !citySuggestions.has(cityName)) {
+        addCityToSuggestions(cityName);
     }
 
     // Clear any existing items in the dropdown list
     dropdownList.innerHTML = '';
 
     let cities = sessionStorage.getItem("cityName");
+
     if (cities) {
         cities = JSON.parse(cities);
 
-        // Limit the number of cities shown in the dropdown
         const filteredCities = cities.slice(0, MAX_SUGGESTIONS);
 
-        filteredCities.forEach((city) => {
-            // Create the list item for each city
-            const list = document.createElement("li");
-            list.textContent = city;
-            list.style.cursor = "pointer"; // Make the cursor a pointer for click action
+        // If there are cities to display, show the dropdown
+        if (filteredCities.length > 0) {
+            filteredCities.forEach((city) => {
+                // Create the list item for each city
+                const list = document.createElement("li");
+                list.textContent = city;
+                list.style.cursor = "pointer"; // Make the cursor a pointer for click action
 
-            // Event listener to update input field on click
-            list.addEventListener("click", () => {
-                console.log(city);
+                // Event listener to update input field on click
+                list.addEventListener("click", () => {
+                    // console.log(city);
 
-                citySearch.value = city;  // Set the value of the input field
-                dropdownList.classList.add("hidden");  // Hide the dropdown after selection
+                    citySearch.value = city;  // Set the value of the input field
+                    dropdownList.classList.add("hidden");  // Hide the dropdown after selection
+                });
+
+                dropdownList.appendChild(list);  // Append the list item to the dropdown
             });
 
-            dropdownList.appendChild(list);  // Append the list item to the dropdown
-        });
-
-        // Show the dropdown if there are cities to display
-        dropdownList.classList.remove("hidden");
-
+            // Show the dropdown if there are cities to display
+            dropdownList.classList.remove("hidden");
+        } else {
+            dropdownList.classList.add("hidden"); // Hide the dropdown if no matches
+        }
     } else {
         console.log("No cities found in sessionStorage.");
+        dropdownList.classList.add("hidden"); // Hide the dropdown if no cities
     }
 }
 
-// Event listener for focus event to show dropdown list
+// Event listener for input field to trigger dropdown list
 citySearch.addEventListener("focus", () => {
     const cityName = citySearch.value.trim();
-    dropDownList(cityName);
+    if (cityName.length > 0) {
+        dropDownList(cityName); // Call to show cities in dropdown
+    } else {
+        dropdownList.classList.add("hidden"); // Hide dropdown if input is empty
+    }
 });
 
-// Event listener for focusout event to hide the dropdown
-citySearch.addEventListener("focusout", () => {
-    // Use a small timeout to allow click event on the list item
-    setTimeout(() => {
-        dropdownList.classList.add("hidden");
-    }, 200);
+// Close dropdown if clicked outside of input or dropdown
+document.addEventListener("click", (event) => {
+    if (!citySearch.contains(event.target) && !dropdownList.contains(event.target)) {
+        dropdownList.classList.add("hidden"); // Hide dropdown if click is outside
+    }
 });
-
-citySearch.addEventListener("focus", () => {
-    const cityName = citySearch.value.trim();
-    dropDownList(cityName);
-});
-
-citySearch.addEventListener("focusout", () => {
-    dropdownList.classList.add("hidden")
-})
 
 searchButton.addEventListener("click", async () => {
     const cityName = citySearch.value.trim();
