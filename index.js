@@ -65,13 +65,8 @@ async function fetchCoordinates(cityName) {
         if (data.length > 0) {
             const { lat, lon } = data[0];
             return { lat, lon };
-        } else {
-            // console.log("city now found");
-            // throw new Error("City not found");
-
         }
     } catch (error) {
-        console.error("Error fetching coordinates:", error);
         return null;
     }
 }
@@ -87,11 +82,8 @@ function getUserLocation() {
                 },
                 (error) => {
                     reject(error);
-                    // console.log("Error getting location.", error);
                 }
             )
-        } else {
-            console.log("Geolocation is not supported by this browser.");
         }
     })
 }
@@ -103,7 +95,6 @@ async function fetchWeatherForCoordinates(lat, lon) {
 
         const pollutionResponse = await fetch(`${API}/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`)
         const pollutionData = await pollutionResponse.json();
-        // console.log(pollutionData);
         displayCurrentWeather(weatherData, pollutionData);
 
         const forecastResponse = await fetch(`${API}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`)
@@ -111,7 +102,8 @@ async function fetchWeatherForCoordinates(lat, lon) {
         displayForecastWeather(forecastData);
 
     } catch (err) {
-        console.log(err);
+        showErrorMessage("Error fetching weather or pollution data.");
+        return err;
     }
 }
 
@@ -220,7 +212,6 @@ function dropDownList(cityName) {
 
                 // Event listener to update input field on click
                 list.addEventListener("click", () => {
-                    // console.log(city);
 
                     citySearch.value = city;  // Set the value of the input field
                     dropdownList.classList.add("hidden");  // Hide the dropdown after selection
@@ -235,7 +226,6 @@ function dropDownList(cityName) {
             dropdownList.classList.add("hidden"); // Hide the dropdown if no matches
         }
     } else {
-        console.log("No cities found in sessionStorage.");
         dropdownList.classList.add("hidden"); // Hide the dropdown if no cities
     }
 }
@@ -257,16 +247,19 @@ document.addEventListener("click", (event) => {
     }
 });
 
+function showErrorMessage(message, duration = 2000) {
+    errorMessage.classList.remove("hidden");
+    errorMessage.querySelector("#errorText").textContent = message;
+    setTimeout(() => {
+        errorMessage.classList.add("hidden");
+    }, duration);
+}
+
+
 searchButton.addEventListener("click", async () => {
     const cityName = citySearch.value.trim();
     if (!cityName) {
-        errorMessage.classList.remove("hidden");
-        errorMessage.querySelector("#errorText").textContent = `Please enter city name.`
-        setTimeout(() => {
-            citySearch.value = ""
-            errorMessage.classList.add("hidden");
-        }, 2000)
-
+        showErrorMessage("Please enter city name.");
     }
 
     if (cityName) {
@@ -276,12 +269,7 @@ searchButton.addEventListener("click", async () => {
             const { lat, lon } = coordinates;
             fetchWeatherForCoordinates(lat, lon);
         } else {
-            errorMessage.classList.remove("hidden");
-            errorMessage.querySelector("#errorText").textContent = `City not found.`
-            setTimeout(() => {
-                citySearch.value = ""
-                errorMessage.classList.add("hidden");
-            }, 2000)
+            showErrorMessage("City not found.")
         }
     }
 })
@@ -293,12 +281,7 @@ currentLocation.addEventListener("click", async () => {
         fetchWeatherForCoordinates(lat, lon);
 
     } catch (error) {
-        errorMessage.classList.remove("hidden");
-        errorMessage.querySelector("#errorText").textContent = `Please enable your location .`
-        // console.log("Error: ", error);
-        setTimeout(() => {
-            errorMessage.classList.add("hidden");
-        }, 2000)
+        showErrorMessage("Please enable your location .")
     }
 })
 
@@ -307,7 +290,6 @@ window.addEventListener("load", async () => {
         const { lat, lon } = await getUserLocation();
         fetchWeatherForCoordinates(lat, lon);
     } catch (error) {
-        // console.error("Error getting user location:", error);
         fetchWeatherForCoordinates(DEFAULT_LAT, DEFAULT_LON);
     }
 })
