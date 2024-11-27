@@ -135,10 +135,6 @@ function displayForecastWeather(resp) {
     // Clear previous forecast cards
     extendedForecast.innerHTML = ''; // Clears all child elements of the container
 
-    // Get today's date and normalize it to midnight
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     // Create a Map to group forecasts by date (12 PM for uniformity)
     const forecastMap = new Map();
 
@@ -147,8 +143,8 @@ function displayForecastWeather(resp) {
         const forecastDate = new Date(item.dt * 1000); // Convert UNIX timestamp to Date
         const forecastDateMidday = new Date(forecastDate.setHours(12, 0, 0, 0)); // Normalize to 12 PM for each day
 
-        // If the forecast is for a future day and not already in the map
-        if (forecastDateMidday > today && !forecastMap.has(forecastDateMidday.toDateString())) {
+        // If the forecast is not in the map then add it
+        if (!forecastMap.has(forecastDateMidday.toDateString())) {
             forecastMap.set(forecastDateMidday.toDateString(), item);
         }
     });
@@ -254,7 +250,6 @@ function showErrorMessage(message, duration = 2000) {
         errorMessage.classList.add("hidden");
     }, duration);
 }
-
 
 searchButton.addEventListener("click", async () => {
     const cityName = citySearch.value.trim();
